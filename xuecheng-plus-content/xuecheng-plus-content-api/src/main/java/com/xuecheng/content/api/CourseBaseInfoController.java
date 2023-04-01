@@ -3,6 +3,7 @@ package com.xuecheng.content.api;
 
 import com.xuecheng.content.model.dto.AddCourseDto;
 import com.xuecheng.content.model.dto.CourseBaseInfoDto;
+import com.xuecheng.content.model.dto.EditCourseDto;
 import com.xuecheng.content.model.dto.QueryCourseParamsDto;
 import com.xuecheng.content.model.po.CourseBase;
 import com.xuecheng.content.service.CourseBaseService;
@@ -33,7 +34,7 @@ public class CourseBaseInfoController {
     @PostMapping("/course")
     public CourseBaseInfoDto createCourseBase(@RequestBody @Validated(ValidationGroups.Insert.class) AddCourseDto addCourseDto){
 
-        Long companyId = 12121212L;
+        Long companyId = 1232141425L;
         CourseBaseInfoDto courseBase = courseBaseService.createCourseBase(companyId, addCourseDto);
 
         return courseBase;
@@ -52,6 +53,14 @@ public class CourseBaseInfoController {
 
         CourseBaseInfoDto courseBaseInfo = courseBaseService.getCourseBaseInfo(courseId);
         return courseBaseInfo;
+    }
+
+    @ApiOperation("修改课程")
+    @PutMapping("/course")
+    public CourseBaseInfoDto modifyCourse(@RequestBody @Validated(ValidationGroups.update.class) EditCourseDto editCourseDto){
+        Long companyId = 1232141425L;
+        CourseBaseInfoDto courseBaseInfoDto = courseBaseService.updateCourseBase(companyId , editCourseDto);
+        return courseBaseInfoDto;
     }
 
 }
