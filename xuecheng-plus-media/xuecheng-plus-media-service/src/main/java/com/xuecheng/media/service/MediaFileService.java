@@ -9,6 +9,7 @@ import com.xuecheng.model.PageResult;
 import com.xuecheng.model.RestResponse;
 import kotlin.coroutines.jvm.internal.RestrictedSuspendLambda;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -30,7 +31,9 @@ public interface MediaFileService {
  public PageResult<MediaFiles> queryMediaFiels(Long companyId, PageParams pageParams, QueryMediaParamsDto queryMediaParamsDto);
 
 
- public UploadFileResultDto uploadFile(Long companyId , UploadFileParamsDto uploadFileParamsDto ,String localFilePath);
+ boolean addMediaFilesToMinIO(String localFilePath, String mimeType, String bucket, String objectName);
+
+ public UploadFileResultDto uploadFile(Long companyId , UploadFileParamsDto uploadFileParamsDto , String localFilePath);
 
  public MediaFiles addMediaFilesToDb(Long companyId , String fileMd5, UploadFileParamsDto uploadFileParamsDto , String bucket , String objectName);
 
@@ -40,4 +43,6 @@ public interface MediaFileService {
  RestResponse uploadChunk(String fileMd5, int chunk, String localChunkFilePath);
 
  RestResponse mergechunks(Long companyId, String fileMd5, int chunkTotal, UploadFileParamsDto uploadFileParamsDto);
+
+ File downloadFileFromMinIO(String bucket, String objectName);
 }

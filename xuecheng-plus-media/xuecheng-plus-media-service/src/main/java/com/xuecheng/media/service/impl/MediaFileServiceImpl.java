@@ -5,25 +5,23 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.j256.simplemagic.ContentInfo;
 import com.j256.simplemagic.ContentInfoUtil;
 import com.xuecheng.exception.XueChengPlusException;
-import com.xuecheng.model.PageParams;
-import com.xuecheng.model.PageResult;
-import com.xuecheng.model.RestResponse;
 import com.xuecheng.media.mapper.MediaFilesMapper;
+import com.xuecheng.media.mapper.MediaProcessMapper;
 import com.xuecheng.media.model.dto.QueryMediaParamsDto;
 import com.xuecheng.media.model.dto.UploadFileParamsDto;
 import com.xuecheng.media.model.dto.UploadFileResultDto;
 import com.xuecheng.media.model.po.MediaFiles;
+import com.xuecheng.media.model.po.MediaProcess;
 import com.xuecheng.media.service.MediaFileService;
+import com.xuecheng.model.PageParams;
+import com.xuecheng.model.PageResult;
+import com.xuecheng.model.RestResponse;
 import io.minio.*;
-import io.minio.errors.*;
 import io.minio.messages.DeleteError;
 import io.minio.messages.DeleteObject;
-import io.minio.messages.DeletedObject;
-import io.minio.messages.Item;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,8 +30,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -59,6 +55,9 @@ public class MediaFileServiceImpl implements MediaFileService {
 
     @Autowired
     MediaFileService currentProxy;
+
+    @Autowired
+    MediaProcessMapper mediaProcessMapper;
 
     //存储普通文件
     @Value("${minio.bucket.files}")
@@ -111,6 +110,7 @@ public class MediaFileServiceImpl implements MediaFileService {
      * @param objectName 对象名
      * @return
      */
+    @Override
     public boolean addMediaFilesToMinIO(String localFilePath,String mimeType,String bucket, String objectName){
         try {
             UploadObjectArgs uploadObjectArgs = UploadObjectArgs.builder()
@@ -124,8 +124,8 @@ public class MediaFileServiceImpl implements MediaFileService {
             log.debug("上传文件到minio成功,bucket:{},objectName:{},错误信息:{}",bucket,objectName);
             return true;
         } catch (Exception e) {
-           e.printStackTrace();
-           log.error("上传文件出错,bucket:{},objectName:{},错误信息:{}",bucket,objectName,e.getMessage());
+            e.printStackTrace();
+            log.error("上传文件出错,bucket:{},objectName:{},错误信息:{}",bucket,objectName,e.getMessage());
         }
         return false;
     }
@@ -223,12 +223,43 @@ public class MediaFileServiceImpl implements MediaFileService {
                 log.debug("向数据库保存文件失败,bucket:{},objectName:{}",bucket,objectName);
                 return null;
             }
+            //记录待处理任务
+            addWaitingTask(mediaFiles);
+
             return mediaFiles;
 
         }
         return mediaFiles;
 
     }
+
+
+    /**
+     * 添加待处理任务
+     * @param mediaFiles 媒资文件信息
+     */
+    private void addWaitingTask(MediaFiles mediaFiles){
+
+        //文件名称
+        String filename = mediaFiles.getFilename();
+        //文件扩展名
+        String extension = filename.substring(filename.lastIndexOf("."));
+        //获取文件的 mimeType
+        String mimeType = getMimeType(extension);
+        if(mimeType.equals("video/x-msvideo")){//如果是avi视频写入待处理任务
+            MediaProcess mediaProcess = new MediaProcess();
+            BeanUtils.copyProperties(mediaFiles,mediaProcess);
+            //状态是未处理
+            mediaProcess.setStatus("1");
+            mediaProcess.setCreateDate(LocalDateTime.now());
+            mediaProcess.setFailCount(0);//失败次数默认0
+            mediaProcess.setUrl(null);
+            mediaProcessMapper.insert(mediaProcess);
+
+        }
+
+    }
+
 
     @Override
     public RestResponse<Boolean> checkFile(String fileMd5) {
@@ -353,7 +384,8 @@ public class MediaFileServiceImpl implements MediaFileService {
             return RestResponse.validfail(false,"文件入库失败");
         }
         //==========清理分块文件=========
-//        clearChunkFiles(chunkFileFolderPath,chunkTotal);
+        clearChunkFiles(chunkFileFolderPath,chunkTotal);
+
 
         return RestResponse.success(true);
     }
@@ -383,7 +415,8 @@ public class MediaFileServiceImpl implements MediaFileService {
      * @param objectName 对象名称
      * @return 下载后的文件
      */
-    public File downloadFileFromMinIO(String bucket,String objectName){
+    @Override
+    public File downloadFileFromMinIO(String bucket, String objectName){
         //临时文件
         File minioFile = null;
         FileOutputStream outputStream = null;
