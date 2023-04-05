@@ -4,12 +4,14 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sun.xml.internal.bind.v2.TODO;
 import com.xuecheng.content.mapper.CourseBaseMapper;
+import com.xuecheng.content.mapper.CourseCategoryMapper;
 import com.xuecheng.content.mapper.CourseMarketMapper;
 import com.xuecheng.content.model.dto.AddCourseDto;
 import com.xuecheng.content.model.dto.CourseBaseInfoDto;
 import com.xuecheng.content.model.dto.EditCourseDto;
 import com.xuecheng.content.model.dto.QueryCourseParamsDto;
 import com.xuecheng.content.model.po.CourseBase;
+import com.xuecheng.content.model.po.CourseCategory;
 import com.xuecheng.content.model.po.CourseMarket;
 import com.xuecheng.content.service.CourseBaseService;
 import com.xuecheng.content.service.CourseCategoryService;
@@ -32,6 +34,9 @@ import java.util.List;
 public class    CourseBaseServiceImpl implements CourseBaseService {
     @Autowired
     CourseBaseMapper courseBaseMapper;
+
+    @Autowired
+    CourseCategoryMapper courseCategoryMapper;
 
     @Autowired
     CourseMarketMapper courseMarketMapper;
@@ -134,6 +139,19 @@ public class    CourseBaseServiceImpl implements CourseBaseService {
         }
 
         //todo:课程分类的名称设置到courseBaseInfoDto中
+
+        // 课程大分类
+        CourseCategory mtObj = courseCategoryMapper.selectById(courseBase.getMt());
+
+        String mtName = mtObj.getName();
+        // 课程小分类
+        CourseCategory stObj = courseCategoryMapper.selectById(courseBase.getSt());
+
+        String stName = stObj.getName();
+
+        courseBaseInfoDto.setStName(stName);
+        courseBaseInfoDto.setMtName(mtName);
+
 
         return courseBaseInfoDto;
     }

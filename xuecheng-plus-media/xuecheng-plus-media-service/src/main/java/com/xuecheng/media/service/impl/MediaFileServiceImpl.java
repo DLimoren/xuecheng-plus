@@ -444,6 +444,13 @@ public class MediaFileServiceImpl implements MediaFileService {
         return null;
     }
 
+    @Override
+    public MediaFiles getFileById(String mediaId) {
+
+        MediaFiles mediaFiles = mediaFilesMapper.selectById(mediaId);
+        return mediaFiles;
+    }
+
     /**
      * 得到合并后的文件的地址
      * @param fileMd5 文件id即md5值
