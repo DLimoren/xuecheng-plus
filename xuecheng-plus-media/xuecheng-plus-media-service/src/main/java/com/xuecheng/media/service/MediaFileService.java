@@ -33,7 +33,8 @@ public interface MediaFileService {
 
  boolean addMediaFilesToMinIO(String localFilePath, String mimeType, String bucket, String objectName);
 
- public UploadFileResultDto uploadFile(Long companyId , UploadFileParamsDto uploadFileParamsDto , String localFilePath);
+
+ public UploadFileResultDto uploadFile(Long companyId, UploadFileParamsDto uploadFileParamsDto, String localFilePath, String objectName);
 
  public MediaFiles addMediaFilesToDb(Long companyId , String fileMd5, UploadFileParamsDto uploadFileParamsDto , String bucket , String objectName);
 

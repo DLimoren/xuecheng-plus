@@ -16,4 +16,6 @@ public interface TeachplanService {
     public void saveTeachplan(SaveTeachplanDto saveTeachplanDto );
 
     public void associationMedia(BindTeachplanMediaDto bindTeachplanMediaDto);
+
+
 }
