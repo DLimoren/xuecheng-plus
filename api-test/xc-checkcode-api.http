@@ -1,5 +1,5 @@
 ### 校验验证码
-POST {{checkcode_host}}/checkcode/verify?key=checkcode4506b95bddbe46cdb0d56810b747db1b&code=70dl
+POST {{checkcode_host}}/checkcode/verify?key=checkcode:5dcff27ad2ad4849bcbb2b019b3fc356&code=p00b
 
 ### 申请验证码
 POST {{checkcode_host}}/checkcode/pic

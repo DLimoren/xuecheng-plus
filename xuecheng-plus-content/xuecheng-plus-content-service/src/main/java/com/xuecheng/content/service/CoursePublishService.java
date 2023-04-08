@@ -1,6 +1,7 @@
 package com.xuecheng.content.service;
 
 import com.xuecheng.content.model.dto.CoursePreviewDto;
+import com.xuecheng.content.model.po.CoursePublish;
 import freemarker.template.TemplateException;
 
 import java.io.File;
@@ -20,4 +21,6 @@ public interface CoursePublishService {
     public File generateCourseHtml(Long courseId) ;
 
     public void uploadCourseHtml(Long courseId , File file);
+
+    public CoursePublish getCoursePublish(Long courseId);
 }
