@@ -43,7 +43,6 @@ public class CoursePublishController {
     public void commitAudit(@PathVariable("courseId") Long courseId){
         Long companyId = 1232141425L;
         coursePublishService.commitAudit(companyId,courseId);
-
     }
 
 
