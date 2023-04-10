@@ -16,4 +16,6 @@ public interface MyCourseTablesService {
 
     public PageResult<XcCourseTables> mycoursetables(MyCourseTableParams params);
 
+
+
 }

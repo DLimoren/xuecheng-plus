@@ -2,7 +2,7 @@
 #微服务配置
 spring:
   application:
-    name: learning-api
+    name: learning-service
   cloud:
     nacos:
       server-addr: 120.48.50.36:8848
@@ -14,10 +14,6 @@ spring:
         group: xuecheng-plus-project
         file-extension: yaml
         refresh-enabled: true
-        extension-configs:
-          - data-id: learning-service-${spring.profiles.active}.yaml
-            group: xuecheng-plus-project
-            refresh: true
         shared-configs:
           - data-id: swagger-${spring.profiles.active}.yaml
             group: xuecheng-plus-common
@@ -26,9 +22,6 @@ spring:
             group: xuecheng-plus-common
             refresh: true
           - data-id: feign-${spring.profiles.active}.yaml
-            group: xuecheng-plus-common
-            refresh: true
-          - data-id: rabbitmq-${spring.profiles.active}.yaml
             group: xuecheng-plus-common
             refresh: true
 
