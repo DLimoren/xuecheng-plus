@@ -74,7 +74,7 @@ public class PicCheckCodeServiceImpl extends AbstractCheckCodeService implements
         String imgBase64Encoder = null;
         try {
             // 对字节数组Base64编码
-            BASE64Encoder base64Encoder = new BASE64Encoder();
+//            BASE64Encoder base64Encoder = new BASE64Encoder();
             ImageIO.write(image, "png", outputStream);
             imgBase64Encoder = "data:image/png;base64," + EncryptUtil.encodeBase64(outputStream.toByteArray());
         } catch (IOException e) {
